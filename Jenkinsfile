@@ -34,13 +34,12 @@ pipeline {
 
                     steps {
                         sh '''
-                            #test -f build/index.html
                             npm test
                         '''
                     }
                     post {
                         always {
-                            junit 'test-results/junit.xml'
+                            junit 'jest-results/junit.xml'
                         }
                     }
                 }
@@ -56,9 +55,9 @@ pipeline {
                     steps {
                         sh '''
                             npm install serve
-                            node_modules/.bin/serve -s build &
+                            node_modules/.bin/serve -s build -l 3000 &
                             sleep 10
-                            npx playwright test  --reporter=html
+                            npx playwright test --reporter=html
                         '''
                     }
 
@@ -81,7 +80,7 @@ pipeline {
             steps {
                 sh '''
                     npm install netlify-cli
-                    node_modules/.bin/netlify --version
+                    node_modules/.bin/netlify deploy --prod
                 '''
             }
         }
