@@ -34,6 +34,7 @@ pipeline {
 
                     steps {
                         sh '''
+                            #test -f build/index.html
                             npm test
                         '''
                     }
@@ -55,21 +56,28 @@ pipeline {
                     steps {
                         sh '''
                             npm install serve
-                            node_modules/.bin/serve -s build -l 3000 &
+                            node_modules/.bin/serve -s build &
                             sleep 10
-                            npx playwright test --reporter=html
+                            npx playwright test  --reporter=html
                         '''
                     }
 
                     post {
                         always {
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                            publishHTML([
+                                allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: false,
+                                reportDir: 'playwright-report',
+                                reportFiles: 'index.html',
+                                reportName: 'Playwright HTML Report'
+                            ])
                         }
                     }
+
                 }
             }
         }
-
 
         stage('Deploy') {
             agent {
@@ -81,7 +89,7 @@ pipeline {
             steps {
                 sh '''
                     npm install netlify-cli
-                    node_modules/.bin/netlify deploy --prod
+                    node_modules/.bin/netlify --version
                 '''
             }
         }
